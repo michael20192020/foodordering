@@ -26,6 +26,8 @@ import coil.compose.AsyncImage
 import com.google.firebase.firestore.FirebaseFirestore
 import com.hansoft.foodordering.data.model.MenuItem
 import androidx.compose.foundation.lazy.items
+import com.hansoft.foodordering.data.model.Order
+
 @Composable
 fun MenuScreen() {
     var menuItems by remember { mutableStateOf<List<MenuItem>>(emptyList()) }
@@ -42,6 +44,8 @@ fun MenuScreen() {
         }
     }
 }
+
+val db = FirebaseFirestore.getInstance()
 
 @Composable
 fun MenuItemCard(item: MenuItem) {
@@ -67,7 +71,7 @@ fun MenuItemCard(item: MenuItem) {
 }
 
 fun getMenuItems(onResult: (List<MenuItem>) -> Unit) {
-    val db = FirebaseFirestore.getInstance()
+   // val db = FirebaseFirestore.getInstance()
 
     db.collection("menuItems")
         .get()
@@ -87,3 +91,50 @@ fun getMenuItems(onResult: (List<MenuItem>) -> Unit) {
             Log.e("Firestore", "Error getting menu items", e)
         }
 }
+
+
+
+
+fun addMenuItem() {
+    val menuItem = hashMapOf(
+        "name" to "Margherita Pizza",
+        "price" to 12.99,
+        "imageUrl" to "https://example.com/pizza.jpg",
+        "category" to "Pizza",
+        "restaurantId" to "12345"
+    )
+
+    db.collection("menuItems")
+        .add(menuItem)
+        .addOnSuccessListener { documentReference ->
+            Log.d("Firestore", "MenuItem added with ID: ${documentReference.id}")
+        }
+        .addOnFailureListener { e ->
+            Log.e("Firestore", "Error adding menu item", e)
+        }
+}
+
+fun updateMenuItem(itemId: String, newName: String) {
+    // val db = FirebaseFirestore.getInstance()
+    db.collection("menuItems").document(itemId)
+        .update("name", newName)
+        .addOnSuccessListener {
+            Log.d("Firestore", "Item updated successfully")
+        }
+        .addOnFailureListener { e ->
+            Log.e("Firestore", "Error updating item", e)
+        }
+}
+
+fun deleteMenuItem(itemId: String) {
+   // val db = FirebaseFirestore.getInstance()
+    db.collection("menuItems").document(itemId)
+        .delete()
+        .addOnSuccessListener {
+            Log.d("Firestore", "Item deleted successfully")
+        }
+        .addOnFailureListener { e ->
+            Log.e("Firestore", "Error deleting item", e)
+        }
+}
+
