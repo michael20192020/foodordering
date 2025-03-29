@@ -14,11 +14,13 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.hansoft.foodordering.data.model.Restaurant
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
 
 @Composable
 fun RestaurantScreen() {
@@ -43,7 +45,7 @@ fun RestaurantScreen() {
                 modifier = Modifier
                     .padding(8.dp)
                     .fillMaxWidth(),
-                //elevation = 4.dp
+                elevation = CardDefaults.cardElevation(4.dp)
             ) {
                 Column {
                     Image(
