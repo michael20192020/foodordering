@@ -12,7 +12,12 @@
           "package_name": "com.hansoft.foodordering"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1018019376729-527f8l1n106hogqho069nifaitn72dfv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAsYoA7_kqK09h_qqvBOZR5um5QSYXeXP8"
@@ -20,7 +25,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1018019376729-527f8l1n106hogqho069nifaitn72dfv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
