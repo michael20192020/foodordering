@@ -76,13 +76,21 @@ fun LoginScreen(viewModel: AuthViewModel, navController: NavController) {
                         if (success) {
                             val userId = viewModel.user?.uid
                             Log.d("aaa","User ID: $userId")
-                            navController.navigate("main/$userId")
+                            val username = viewModel.user?.email
+                            if (username == "admin2025@hotmail.com")
                             {
-                              //  popUpTo("login") { inclusive = true }
+                                navController.navigate("admin")
+                            }
+                            else {
+                                navController.navigate("main/$userId")
                             }
 
 
-                        } else errorMessage = error
+
+                        } else {
+                            isLoading = false
+                            errorMessage = error
+                        }
                     }
                 },
                 enabled = !isLoading

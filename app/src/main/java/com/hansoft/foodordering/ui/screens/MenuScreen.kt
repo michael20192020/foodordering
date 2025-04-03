@@ -2,6 +2,7 @@ package com.hansoft.foodordering.ui.screens
 
 import android.util.Log
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -35,16 +36,17 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
+import com.google.firebase.Timestamp
 import com.hansoft.foodordering.data.model.Order
 import com.hansoft.foodordering.viewmodel.MenuViewModel
 import com.hansoft.foodordering.viewmodel.OrderViewModel
 
 @Composable
-fun MenuScreen(viewModel: MenuViewModel, orderViewModel: OrderViewModel, userId: String, onProceedToOrder: () -> Unit) {
+fun MenuScreen(menuViewModel: MenuViewModel, orderViewModel: OrderViewModel, userId: String, onProceedToOrder: () -> Unit) {
     // var menuItems by remember { mutableStateOf<List<MenuItem>>(emptyList()) }
 
-    val menuItems by viewModel.menuItems.collectAsState()
-    val selectedItems by viewModel.selectedItems.collectAsState()
+    val menuItems by menuViewModel.menuItems.collectAsState()
+    val selectedItems by menuViewModel.selectedItems.collectAsState()
     var message by remember { mutableStateOf("") }
     /*
     LaunchedEffect(Unit) {
@@ -56,11 +58,22 @@ fun MenuScreen(viewModel: MenuViewModel, orderViewModel: OrderViewModel, userId:
      */
     Column {
         Spacer(modifier = Modifier.height(16.dp))
-        Text(text = "Menu Screen", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(text = "Menu", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+        }
+
         Spacer(modifier = Modifier.height(16.dp))
-        LazyColumn {
+        LazyColumn(
+            modifier = Modifier
+                .weight(1f) // This allows LazyColumn to take available space but not push the button out
+                .fillMaxWidth()
+        )
+        {
             items(menuItems) { item ->
-                MenuItemCard(item, viewModel::toggleSelection, selectedItems.contains(item))
+                MenuItemCard(item, menuViewModel::toggleSelection, selectedItems.contains(item))
             }
         }
 
@@ -73,20 +86,24 @@ fun MenuScreen(viewModel: MenuViewModel, orderViewModel: OrderViewModel, userId:
                    // var newid = "0"
                     orderViewModel.getNewID { count ->
                         // Use the `count` string here, for example, to generate a new order ID
-                        Log.d("Firestore", "The new order ID count is: $count")
+                        Log.d("Firestore", "The new order ID is: $count")
                      //   newid = count
 
                         val order = Order(
                             orderId = count,
                             userId = userId,
                             items = selectedItems.map { it.name + "   $" + it.price.toString() + " \n" },
-                            totalPrice = selectedItems.sumOf { it.price }
+                            totalPrice = selectedItems.sumOf { it.price },
+                            timestamp = Timestamp.now()
                         )
 
-                        orderViewModel.placeOrder(
+                        orderViewModel.placeOrderNew(
                             order,
                             onSuccess = { message = "Order placed successfully!" },
                             onError = { message = "Failed to place order: ${it.message}" })
+
+                        onProceedToOrder()
+
                     }
                 },
                 modifier = Modifier
@@ -97,7 +114,12 @@ fun MenuScreen(viewModel: MenuViewModel, orderViewModel: OrderViewModel, userId:
             }
 
             if (message.isNotEmpty()) {
-                Text(message, color = Color.Green, modifier = Modifier.padding(top = 16.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(message, color = Color.Green, modifier = Modifier.padding(top = 16.dp))
+                }
             }
         }
     }
@@ -122,8 +144,9 @@ fun MenuItemCard(item: MenuItem, onItemSelected: (MenuItem) -> Unit,isSelected: 
                 modifier = Modifier.size(64.dp)
             )
             Spacer(modifier = Modifier.width(16.dp))
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(text = item.name, fontWeight = FontWeight.Bold)
+                Text(text = item.description)
                 Text(text = "$${item.price}", color = Color.Gray)
             }
             Checkbox(checked = isSelected, onCheckedChange = { onItemSelected(item) })
@@ -154,11 +177,12 @@ fun getMenuItems(onResult: (List<MenuItem>) -> Unit) {
         .addOnSuccessListener { documents ->
             val items = documents.map { document ->
                 MenuItem(
-                    id = document.id,
+                    id = document.id.toInt(),
                     name = document.getString("name") ?: "",
                     price = document.getDouble("price") ?: 0.0,
                     imageUrl = document.getString("imageUrl") ?: "",
-                    category = document.getString("category") ?: ""
+                    category = document.getString("category") ?: "",
+                    description = document.getString("description") ?: ""
                 )
             }
             onResult(items)

@@ -13,6 +13,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,7 +32,7 @@ import com.hansoft.foodordering.viewmodel.OrderViewModel
 
 @Composable
 fun HomeScreen(menuViewModel: MenuViewModel, orderViewModel: OrderViewModel, userId: String, modifier: Modifier = Modifier) {
-    var screen by remember { mutableStateOf("orders") }
+    var screen by remember { mutableStateOf("create_order") }
     var selectedItem by remember { mutableStateOf<MenuItem?>(null) }
     Column(
         modifier = Modifier
@@ -41,34 +42,37 @@ fun HomeScreen(menuViewModel: MenuViewModel, orderViewModel: OrderViewModel, use
         verticalArrangement = Arrangement.Center
     ) {
         Spacer(modifier = Modifier.height(16.dp))
-        Text(text = "Home Screen", fontSize = 24.sp, fontWeight = FontWeight.Bold)
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(text = "Welcome to Food Ordering App!", style = MaterialTheme.typography.headlineMedium)
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(text = "User ID: $userId", style = MaterialTheme.typography.bodyMedium)
+       // Text(text = "Home Screen", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+       // Spacer(modifier = Modifier.height(16.dp))
+        Text(text = "Online Food Ordering", style = MaterialTheme.typography.headlineMedium)
+       // Spacer(modifier = Modifier.height(16.dp))
+      //  Text(text = "User ID: $userId", style = MaterialTheme.typography.bodyMedium)
         Spacer(modifier = Modifier.height(16.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         )  {
-            Button(onClick = { screen = "orders" }) { Text("View Orders") }
-            Button(onClick = { screen = "create_order" }) { Text("Place Order") }
+            Button(onClick = {
+                screen = "create_order"
+                menuViewModel.clearSelection()
+            }) { Text("Create Order") }
+            Button(onClick = { screen = "view_orders" }) { Text("View Orders") }
         }
         Spacer(modifier = Modifier.height(16.dp))
         when (screen) {
-            "orders" -> OrderListScreen(orderViewModel, userId)
+            "view_orders" -> OrderListScreen(orderViewModel, userId)
             "create_order" ->
 
                 if (selectedItem == null) {
                     MenuScreen(menuViewModel,orderViewModel,userId) {
-                        screen = "orders"
+                        screen = "view_orders"
                     }
                 } else {
-                    Log.d("aaa", "PlaceOrderScreen")
-                    PlaceOrderScreen(orderViewModel, menuViewModel, userId)
+                   // Log.d("aaa", "PlaceOrderScreen")
+                   // PlaceOrderScreen(orderViewModel, menuViewModel, userId)
                 }
-            //   PlaceOrderScreen(viewModel, userId)
+
         }
     }
 }

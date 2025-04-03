@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.firebase.Timestamp
 import com.hansoft.foodordering.data.model.MenuItem
 import com.hansoft.foodordering.data.model.Order
 import com.hansoft.foodordering.viewmodel.MenuViewModel
@@ -51,12 +52,15 @@ fun PlaceOrderScreen(orderViewModel: OrderViewModel, menuViewModel: MenuViewMode
         Button(
             onClick = {
                 val order = Order(
-                    orderId = "",
+                    orderId = 0,
                     userId = userId,
-                    items = selectedItems.map { it.name },
-                    totalPrice = totalPrice
+                    items = selectedItems.map { it.name + "   " + it.price},
+                    totalPrice = totalPrice,
+                    timestamp = Timestamp.now()
                 )
-                orderViewModel.placeOrder(order,onSuccess = { message = "Order placed successfully!" },onError = { message = "Failed to place order: ${it.message}"})
+                //orderViewModel.placeOrder(order,onSuccess = { message = "Order placed successfully!" },onError = { message = "Failed to place order: ${it.message}"})
+                orderViewModel.placeOrderNew(order,onSuccess = { message = "Order placed successfully!" },onError = { message = "Failed to place order: ${it.message}"})
+
             },
             modifier = Modifier.padding(top = 16.dp)
         ) {

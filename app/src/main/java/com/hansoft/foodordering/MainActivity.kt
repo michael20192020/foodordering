@@ -24,12 +24,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.hansoft.foodordering.data.model.MenuItem
+import com.hansoft.foodordering.ui.screens.AdminScreen
 import com.hansoft.foodordering.ui.screens.HomeScreen
 import com.hansoft.foodordering.ui.screens.LoginScreen
 import com.hansoft.foodordering.ui.screens.MenuScreen
 import com.hansoft.foodordering.ui.screens.OrderListScreen
 import com.hansoft.foodordering.ui.screens.PlaceOrderScreen
 import com.hansoft.foodordering.ui.screens.SignUpScreen
+import com.hansoft.foodordering.ui.screens.UpdateOrderScreen
 import com.hansoft.foodordering.ui.theme.FoodOrderingTheme
 import com.hansoft.foodordering.viewmodel.AuthViewModel
 import com.hansoft.foodordering.viewmodel.MenuViewModel
@@ -45,7 +47,7 @@ class MainActivity : ComponentActivity() {
         val authViewModel: AuthViewModel by viewModels()
 
         setContent {
-            val userId = remember { "user_12345" }
+
             val navController = rememberNavController()
             FoodOrderingTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -94,6 +96,7 @@ fun AppNavigation(authViewModel: AuthViewModel,menuViewModel: MenuViewModel, ord
             val userId = backStackEntry.arguments?.getString("userId") ?: ""
             HomeScreen(menuViewModel, orderViewModel, userId) }
         composable("signup") { SignUpScreen(authViewModel,navController) }
+        composable("admin") { AdminScreen(menuViewModel,orderViewModel) }
     }
 }
 
