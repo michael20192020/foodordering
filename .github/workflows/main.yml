@@ -35,3 +35,6 @@ jobs:
       with:
         name: app-debug.apk
         path: '**/outputs/apk/**/*.apk'
+
+    - name: Debug Output Directory
+      run: ls -R app/build/outputs/apk
