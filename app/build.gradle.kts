@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     id("com.google.gms.google-services")
+    id("com.google.devtools.ksp") version "1.9.20-1.0.14"
 }
 
 android {
@@ -61,6 +62,8 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
 
+    implementation("androidx.compose.material:material-icons-extended:1.7.3")
+
     implementation("androidx.navigation:navigation-compose:2.5.3")
 
     implementation(platform("com.google.firebase:firebase-bom:33.1.1"))
@@ -79,8 +82,16 @@ dependencies {
     implementation("com.google.android.gms:play-services-measurement-impl:22.1.0")
     implementation("com.google.firebase:firebase-messaging:23.3.1")
 
-   // implementation("androidx.compose.ui:ui:1.6.2")
+    //implementation(libs.androidx.material3.android)
+
+    // implementation("androidx.compose.ui:ui:1.6.2")
     //implementation("androidx.compose.compiler:compiler:1.5.1")
+
+    implementation("androidx.room:room-ktx:2.6.0")
+    implementation("androidx.room:room-runtime:2.6.0")
+    ksp("androidx.room:room-compiler:2.6.0")
+
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

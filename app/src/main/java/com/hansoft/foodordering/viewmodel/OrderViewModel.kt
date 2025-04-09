@@ -60,6 +60,9 @@ class OrderViewModel : ViewModel() {
             .addOnFailureListener { exception -> onError(exception) }
     }
 
+
+
+
     fun placeOrderNew(order: Order, onSuccess: () -> Unit, onError: (Exception) -> Unit) {
         viewModelScope.launch {
             /*
@@ -100,6 +103,19 @@ class OrderViewModel : ViewModel() {
             .addOnFailureListener { e ->
                 onError(e)
                 Log.e("aaa", "Error updating order status", e)
+            }
+    }
+
+    fun searchOrderItemById(id: Int, onResult: (Order?) -> Unit) {
+        db.collection("ordersNew")
+            .whereEqualTo("orderId", id)
+            .get()
+            .addOnSuccessListener { result ->
+                val item = result.documents.firstOrNull()?.toObject(Order::class.java)
+                onResult(item)
+            }
+            .addOnFailureListener {
+                onResult(null)
             }
     }
 

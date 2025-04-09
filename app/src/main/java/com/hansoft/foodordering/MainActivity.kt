@@ -24,6 +24,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.hansoft.foodordering.data.model.MenuItem
+import com.hansoft.foodordering.ui.screens.AddMenuItemScreen
 import com.hansoft.foodordering.ui.screens.AdminScreen
 import com.hansoft.foodordering.ui.screens.HomeScreen
 import com.hansoft.foodordering.ui.screens.LoginScreen
@@ -34,6 +35,7 @@ import com.hansoft.foodordering.ui.screens.SignUpScreen
 import com.hansoft.foodordering.ui.screens.UpdateOrderScreen
 import com.hansoft.foodordering.ui.theme.FoodOrderingTheme
 import com.hansoft.foodordering.viewmodel.AuthViewModel
+import com.hansoft.foodordering.viewmodel.CartViewModel
 import com.hansoft.foodordering.viewmodel.MenuViewModel
 import com.hansoft.foodordering.viewmodel.OrderViewModel
 
@@ -45,13 +47,15 @@ class MainActivity : ComponentActivity() {
         val menuViewModel: MenuViewModel by viewModels()
         val orderViewModel: OrderViewModel by viewModels()
         val authViewModel: AuthViewModel by viewModels()
+        val cartViewModel: CartViewModel by viewModels()
 
         setContent {
 
-            val navController = rememberNavController()
+
             FoodOrderingTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    AppNavigation(authViewModel,menuViewModel, orderViewModel, navController,
+                    AppNavigation(authViewModel,menuViewModel,
+                        orderViewModel,cartViewModel,
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -88,15 +92,18 @@ fun MainScreen(menuViewModel: MenuViewModel, orderViewModel: OrderViewModel, use
 }
 
 @Composable
-fun AppNavigation(authViewModel: AuthViewModel,menuViewModel: MenuViewModel, orderViewModel: OrderViewModel,navController: NavHostController,modifier: Modifier = Modifier) {
-
+fun AppNavigation(authViewModel: AuthViewModel,menuViewModel: MenuViewModel,
+                  orderViewModel: OrderViewModel,cartViewModel: CartViewModel,
+                  modifier: Modifier = Modifier) {
+    val navController = rememberNavController()
     NavHost(navController, startDestination = "login") {
         composable("login") { LoginScreen(authViewModel,navController) }
         composable("main/{userId}") {  backStackEntry ->
             val userId = backStackEntry.arguments?.getString("userId") ?: ""
-            HomeScreen(menuViewModel, orderViewModel, userId) }
+            HomeScreen(menuViewModel, orderViewModel, cartViewModel,userId,onBackClick = { navController.popBackStack() }) }
         composable("signup") { SignUpScreen(authViewModel,navController) }
-        composable("admin") { AdminScreen(menuViewModel,orderViewModel) }
+        composable("admin") { AdminScreen(menuViewModel,orderViewModel,onBackClick = { navController.popBackStack() }) }
+       // composable("add_menu") { AddMenuItemScreen(menuViewModel,onBackClick = { navController.popBackStack() }) }
     }
 }
 

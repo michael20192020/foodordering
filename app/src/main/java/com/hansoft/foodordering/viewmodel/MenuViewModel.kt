@@ -19,6 +19,10 @@ class MenuViewModel : ViewModel() {
     private val _selectedItems = MutableStateFlow<MutableList<MenuItem>>(mutableListOf())
     val selectedItems: StateFlow<List<MenuItem>> = _selectedItems
     private val userId = FirebaseAuth.getInstance().currentUser?.uid ?: "guest"
+ //   private val _cartItems = MutableStateFlow<List<MenuItem>>(emptyList())
+ //   val cartItems: StateFlow<List<MenuItem>> = _cartItems
+  //  private val _categoryItems = MutableStateFlow<List<String>>(emptyList())
+  //  val categoryItems: StateFlow<List<String>> = _categoryItems
     init {
        // fetchMenuItems()
        fetchMenuItemsCoroutine()
@@ -37,15 +41,38 @@ class MenuViewModel : ViewModel() {
                         //id = doc.id.toIntOrNull() ?: 0,
                         name = doc.getString("name") ?: "",
                         description = doc.getString("description") ?: "",
+                        category = doc.getString("category") ?: "",
                         price = doc.getDouble("price") ?: 0.0,
                         imageUrl = doc.getString("imageUrl") ?: ""
                     )
                 }
                 _menuItems.value = items
+               // _categoryItems.value = items.map { it.category }.distinct()
             }
             .addOnFailureListener { exception ->
                 Log.d("aaa", "Error fetching menu: ${exception.message}")
             }
+    }
+
+    fun fetchMenuItemsCoroutine() {
+        viewModelScope.launch {
+            try {
+                val snapshot = db.collection("menuItems").get().await()
+                val items = snapshot.documents.map { doc ->
+                    MenuItem(
+                        //id = doc.id.toInt(),
+                        name = doc.getString("name") ?: "",
+                        description = doc.getString("description") ?: "",
+                        category = doc.getString("category") ?: "",
+                        price = doc.getDouble("price") ?: 0.0,
+                        imageUrl = doc.getString("imageUrl") ?: ""
+                    )
+                }
+                _menuItems.value = items
+            } catch (e: Exception) {
+                Log.d("aaa", "Error fetching menu items: ${e.message}")
+            }
+        }
     }
 
     fun getNewID(callback: (Int) -> Unit) {
@@ -65,26 +92,6 @@ class MenuViewModel : ViewModel() {
 
     }
 
-    fun fetchMenuItemsCoroutine() {
-        viewModelScope.launch {
-            try {
-                val snapshot = db.collection("menuItems").get().await()
-                val items = snapshot.documents.map { doc ->
-                    MenuItem(
-                        //id = doc.id.toInt(),
-                        name = doc.getString("name") ?: "",
-                        description = doc.getString("description") ?: "",
-                        price = doc.getDouble("price") ?: 0.0,
-                        imageUrl = doc.getString("imageUrl") ?: ""
-                    )
-                }
-                _menuItems.value = items
-            } catch (e: Exception) {
-                Log.d("aaa", "Error fetching menu items: ${e.message}")
-            }
-        }
-    }
-
     fun addMenuItem(menuItem: MenuItem,  onSuccess: () -> Unit, onError: (Exception) -> Unit) {
 
         db.collection("menuItems")
@@ -96,6 +103,36 @@ class MenuViewModel : ViewModel() {
                 exception -> onError(exception)
             }
     }
+
+
+    fun updateMenuItemByMenuId(menuItem: MenuItem,onSuccess: () -> Unit, onError: (Exception) -> Unit) {
+        db.collection("menuItems")
+            .whereEqualTo("id", menuItem.id)
+            .get()
+            .addOnSuccessListener { documents ->
+                if (documents.isEmpty) {
+                    Log.d("Firestore", "No item found with menuId: ${menuItem.id}")
+                    return@addOnSuccessListener
+                }
+
+                for (document in documents) {
+                    db.collection("menuItems").document(document.id)
+                        .set(menuItem) // Replace the whole document with new data
+                        .addOnSuccessListener {
+                            Log.d("Firestore", "Menu item with id=${menuItem.id} updated successfully")
+                            onSuccess()
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e("Firestore", "Error updating item with id=${menuItem.id}", e)
+                            onError(e)
+                        }
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e("Firestore", "Error finding item by menuId", e)
+            }
+    }
+
 
     fun placeOrder(selectedItems: List<MenuItem>) {
         viewModelScope.launch {
@@ -123,5 +160,58 @@ class MenuViewModel : ViewModel() {
             currentList.add(item)
         }
         _selectedItems.value = currentList
+      //  Log.d("aaa", "Selected items: ${selectedItems.value}")
+    }
+
+    fun deleteMenuItem(itemId: String) {
+
+        db.collection("menuItems").document(itemId)
+            .delete()
+            .addOnSuccessListener {
+                Log.d("Firestore", "Item deleted successfully")
+            }
+            .addOnFailureListener { e ->
+                Log.e("Firestore", "Error deleting item", e)
+            }
+    }
+
+    fun updateMenuItem(itemId: String, newName: String) {
+        // val db = FirebaseFirestore.getInstance()
+        db.collection("menuItems").document(itemId)
+            .update("name", newName)
+            .addOnSuccessListener {
+                Log.d("Firestore", "Item updated successfully")
+            }
+            .addOnFailureListener { e ->
+                Log.e("Firestore", "Error updating item", e)
+            }
+    }
+
+    /*
+    fun addToCart(item: MenuItem) {
+        _cartItems.value = _cartItems.value + item
+    }
+
+    fun removeFromCart(item: MenuItem) {
+        _cartItems.value = _cartItems.value - item
+    }
+
+    fun clearCart() {
+        _cartItems.value = emptyList()
+    }
+
+     */
+
+    fun searchMenuItemById(id: Int, onResult: (MenuItem?) -> Unit) {
+        db.collection("menuItems")
+            .whereEqualTo("id", id)
+            .get()
+            .addOnSuccessListener { result ->
+                val item = result.documents.firstOrNull()?.toObject(MenuItem::class.java)
+                onResult(item)
+            }
+            .addOnFailureListener {
+                onResult(null)
+            }
     }
 }

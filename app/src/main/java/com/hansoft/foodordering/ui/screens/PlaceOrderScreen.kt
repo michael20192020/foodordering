@@ -1,5 +1,6 @@
 package com.hansoft.foodordering.ui.screens
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -18,6 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -36,8 +38,9 @@ fun PlaceOrderScreen(orderViewModel: OrderViewModel, menuViewModel: MenuViewMode
     val selectedItems by menuViewModel.selectedItems.collectAsState()
     var message by remember { mutableStateOf("") }
 
+
     Column(modifier = Modifier.fillMaxSize().padding(16.dp),horizontalAlignment = Alignment.CenterHorizontally) {
-        Text("Confirm Order", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text("Confirm Order",fontSize = 20.sp, fontWeight = FontWeight.Bold)
 
         LazyColumn {
             items(selectedItems) { item ->
@@ -46,7 +49,7 @@ fun PlaceOrderScreen(orderViewModel: OrderViewModel, menuViewModel: MenuViewMode
         }
 
         val totalPrice = selectedItems.sumOf { it.price }
-        Text("Total Price: $${String.format("%.2f", totalPrice)}", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+        Text("Total Price: $${String.format("%.2f", totalPrice)}",fontWeight = FontWeight.Bold, fontSize = 18.sp)
 
 
         Button(

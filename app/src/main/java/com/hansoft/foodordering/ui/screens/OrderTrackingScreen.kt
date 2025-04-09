@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -52,8 +53,8 @@ fun OrderTrackingScreen(orderId: String,modifier: Modifier = Modifier) {
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Order ID: ${orderId}", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-            Text("Status: ${order.status}", fontSize = 16.sp)
+            Text("Order ID: ${orderId}",fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text("Status: ${order.status}",fontSize = 16.sp)
 
             // Animated Progress Bar
             val progress = when (order.status) {
@@ -72,7 +73,7 @@ fun OrderTrackingScreen(orderId: String,modifier: Modifier = Modifier) {
                 color = Color.Green
             )
         }
-    } ?: Text("Loading order details...", modifier = Modifier.padding(16.dp))
+    } ?: Text("Loading order details...",modifier = Modifier.padding(16.dp))
 
    // OrderProgressUI(orderStatus.value)
 }
@@ -93,7 +94,7 @@ fun OrderProgressUI(orderStatus: String) {
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Order Status: $orderStatus", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+        Text("Order Status: $orderStatus",fontWeight = FontWeight.Bold, fontSize = 18.sp)
         Spacer(modifier = Modifier.height(8.dp))
         LinearProgressIndicator(progress = progress, modifier = Modifier.fillMaxWidth())
     }

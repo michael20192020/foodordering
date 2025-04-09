@@ -1,5 +1,6 @@
 package com.hansoft.foodordering.ui.screens
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,13 +20,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.LastBaseline
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.hansoft.foodordering.data.model.Order
+import com.hansoft.foodordering.utils.formatTimestamp
 import com.hansoft.foodordering.viewmodel.OrderViewModel
 
 @Composable
@@ -80,7 +84,17 @@ fun OrderItem(order: Order) {
                 Text(text = "Status: ")
                 Text(text = "${order.status}")
             }
-            //Text("Status: ${order.status}")
+            Text(text = "Ordered at: ${formatTimestamp(order.timestamp)}")
+            if (order.name.isNotEmpty()){
+                Text(text = "Name: ${order.name}")
+            }
+            if (order.phoneNumber.isNotEmpty()){
+                Text(text = "Phone Number: ${order.phoneNumber}")
+            }
+            if (order.address.isNotEmpty()){
+                Text(text = "address: ${order.address}")
+            }
+
         }
     }
 }
