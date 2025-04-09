@@ -39,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import com.google.firebase.Timestamp
 import com.hansoft.foodordering.data.model.CartItem
+import com.hansoft.foodordering.data.model.CartItemEntity
 import com.hansoft.foodordering.data.model.Order
 import com.hansoft.foodordering.viewmodel.CartViewModel
 import com.hansoft.foodordering.viewmodel.OrderViewModel
@@ -47,76 +48,92 @@ import com.hansoft.foodordering.viewmodel.OrderViewModel
 @Composable
 fun DineInScreen(cartViewModel: CartViewModel, orderViewModel: OrderViewModel,userId: String, onCheckout: () -> Unit) {
 
-    val cartItems by cartViewModel.cartItems.collectAsState()
+    var uiState = cartViewModel.cartkUiState.collectAsState()
+    //val cartItems by cartViewModel.cartItems.collectAsState()
+    val cartItems = uiState.value.itemList
     val totalPrice = cartItems.sumOf { it.quantity * it.price }
     var message by remember { mutableStateOf("") }
 
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        Text("Dine In", fontSize = 24.sp, fontWeight = FontWeight.Bold)
-        LazyColumn {
-            items(cartItems) { item ->
-                SwipeToDismiss(
-                    state = rememberDismissState(DismissValue.Default),
-                    background = { Color.Red },
-                    dismissContent = {
-                        DineInItemView(
-                            item = item,
-                            onDeleteClick = { cartViewModel.deleteCartItem(item.id) },
-                            onReduceQuantityClick = { cartViewModel.reduceItemQuantity(item.id)},
-                            onIncreaseQuantityClick = { cartViewModel.increaseItemQuantity(item.id)}
-                        )
-                    }
-                )
-            }
+    LazyColumn(modifier = Modifier
+        .fillMaxSize()
+        .padding(16.dp)) {
+        item {
+            Text("Dine In", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+
         }
-        Spacer(modifier = Modifier.height(16.dp))
-        Text("Total: $${String.format("%.2f", totalPrice)}", fontSize = 20.sp)
-        Spacer(modifier = Modifier.height(16.dp))
 
-
-        Button(
-            onClick = {
-
-
-
-                orderViewModel.getNewID { count ->
-                    // Use the `count` string here, for example, to generate a new order ID
-                    Log.d("aaa", "The new order ID is: $count")
-                    //   newid = count
-
-                    val order = Order(
-                        orderId = count,
-                        userId = userId,
-                        //items = cartItems.map { it.name + "   $" + (it.quantity * it.price).toString() + " \n" },
-                        items = cartItems.map { "${it.name} x${it.quantity}" + "   $" + (it.quantity * it.price).toString() + " \n" },
-                        totalPrice = cartItems.sumOf { (it.quantity * it.price) },
-                        timestamp = Timestamp.now()
+        items(cartItems) { item ->
+            SwipeToDismiss(
+                state = rememberDismissState(DismissValue.Default),
+                background = { Color.Red },
+                dismissContent = {
+                    DineInItemView(
+                        item = item,
+                        onDeleteClick = {
+                            //cartViewModel.deleteCartItem(item.id)
+                            cartViewModel.deleteCartItem(item)
+                                        },
+                        onReduceQuantityClick = {
+                            //cartViewModel.reduceItemQuantity(item.id)
+                            cartViewModel.reduceItemQuantity(item)
+                                                },
+                        onIncreaseQuantityClick = {
+                            //cartViewModel.increaseItemQuantity(item.id)
+                            cartViewModel.increaseItemQuantity(item)
+                        }
                     )
-
-                    orderViewModel.placeOrderNew(
-                        order,
-                        onSuccess = {
-                            message = "Order placed successfully!"
-                            onCheckout()
-                                    },
-                        onError = { message = "Failed to place order: ${it.message}" })
-
-
                 }
+            )
+        }
+        item {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text("Total: $${String.format("%.2f", totalPrice)}", fontSize = 20.sp)
+            Spacer(modifier = Modifier.height(16.dp))
 
 
+            Button(
+                onClick = {
 
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Checkout")
+
+                    orderViewModel.getNewID { count ->
+                        // Use the `count` string here, for example, to generate a new order ID
+                        Log.d("aaa", "The new order ID is: $count")
+                        //   newid = count
+
+                        val order = Order(
+                            orderId = count,
+                            userId = userId,
+                            //items = cartItems.map { it.name + "   $" + (it.quantity * it.price).toString() + " \n" },
+                            items = cartItems.map { "${it.name} x${it.quantity}" + "   $" + (it.quantity * it.price).toString() + " \n" },
+                            totalPrice = cartItems.sumOf { (it.quantity * it.price) },
+                            timestamp = Timestamp.now()
+                        )
+
+                        orderViewModel.placeOrderNew(
+                            order,
+                            onSuccess = {
+                                message = "Order placed successfully!"
+                                cartViewModel.clearCart()
+                                onCheckout()
+                            },
+                            onError = { message = "Failed to place order: ${it.message}" })
+
+
+                    }
+
+
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Checkout")
+            }
         }
     }
 }
 
 @Composable
-fun DineInItemView(item: CartItem, onDeleteClick: () -> Unit, onReduceQuantityClick: () -> Unit,
-                 onIncreaseQuantityClick: () -> Unit) {
+fun DineInItemView(item: CartItemEntity, onDeleteClick: () -> Unit, onReduceQuantityClick: () -> Unit,
+                   onIncreaseQuantityClick: () -> Unit) {
 
     Card(
         modifier = Modifier

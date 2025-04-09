@@ -43,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.TextLayoutResult
 import com.google.firebase.Timestamp
 import com.hansoft.foodordering.data.model.CartItem
+import com.hansoft.foodordering.data.model.CartItemEntity
 import com.hansoft.foodordering.data.model.Order
 import com.hansoft.foodordering.viewmodel.CartViewModel
 import com.hansoft.foodordering.viewmodel.MenuViewModel
@@ -174,8 +175,11 @@ fun MenuScreen(menuViewModel: MenuViewModel, orderViewModel: OrderViewModel,
 
                      */
                     selectedItems.forEachIndexed { index, item ->
-                        val cartItem = CartItem(id = index + 1, name = item.name, price = item.price, quantity = 1, imageUrl = item.imageUrl)
-                        cartViewModel.addToCart(cartItem)
+                        //val cartItem = CartItem(id = index + 1, name = item.name, price = item.price, quantity = 1, imageUrl = item.imageUrl)
+                        //cartViewModel.addToCart(cartItem)
+                        val cartItemEntity = CartItemEntity(name = item.name, price = item.price, quantity = 1, imageUrl = item.imageUrl)
+                        Log.d("aaa", "MenuScreen: ${item.name}")
+                        cartViewModel.addToCart(cartItemEntity)
                     }
                     onDineIn()
 
@@ -191,8 +195,10 @@ fun MenuScreen(menuViewModel: MenuViewModel, orderViewModel: OrderViewModel,
                 onClick = {
 
                     selectedItems.forEachIndexed { index, item ->
-                        val cartItem = CartItem(id = index + 1, name = item.name, price = item.price, quantity = 1, imageUrl = item.imageUrl)
-                        cartViewModel.addToCart(cartItem)
+                       // val cartItem = CartItem(id = index + 1, name = item.name, price = item.price, quantity = 1, imageUrl = item.imageUrl)
+                       // cartViewModel.addToCart(cartItem)
+                        val cartItemEntity = CartItemEntity(name = item.name, price = item.price, quantity = 1, imageUrl = item.imageUrl)
+                        cartViewModel.addToCart(cartItemEntity)
                     }
                     onTakeaway()
 

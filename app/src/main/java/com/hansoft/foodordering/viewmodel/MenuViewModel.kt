@@ -1,14 +1,20 @@
 package com.hansoft.foodordering.viewmodel
 
+import android.content.Context
 import android.util.Log
+import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.hansoft.foodordering.data.model.MenuItem
+import com.hansoft.foodordering.ui.screens.CART_TYPE_KEY
+import com.hansoft.foodordering.ui.screens.dataStore
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
@@ -104,6 +110,28 @@ class MenuViewModel : ViewModel() {
             }
     }
 
+    fun readCartType(context: Context): Flow<String> {
+        return context.dataStore.data.map { preferences ->
+            preferences[CART_TYPE_KEY] ?: "dine in"  }
+
+    }
+
+    fun saveCartType(context: Context, value: String) {
+        viewModelScope.launch {
+            context.dataStore.edit { preferences ->
+                preferences[CART_TYPE_KEY] = value
+            }
+        }
+    }
+
+    /*
+    suspend fun saveCartType(context: Context, value: String) {
+        context.dataStore.edit { preferences ->
+            preferences[CART_TYPE_KEY] = value
+        }
+    }
+
+     */
 
     fun updateMenuItemByMenuId(menuItem: MenuItem,onSuccess: () -> Unit, onError: (Exception) -> Unit) {
         db.collection("menuItems")

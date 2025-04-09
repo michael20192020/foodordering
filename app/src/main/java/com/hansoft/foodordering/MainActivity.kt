@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -47,7 +48,7 @@ class MainActivity : ComponentActivity() {
         val menuViewModel: MenuViewModel by viewModels()
         val orderViewModel: OrderViewModel by viewModels()
         val authViewModel: AuthViewModel by viewModels()
-        val cartViewModel: CartViewModel by viewModels()
+       // val cartViewModel: CartViewModel = viewModel(factory = CartViewModel.factory)
 
         setContent {
 
@@ -55,7 +56,7 @@ class MainActivity : ComponentActivity() {
             FoodOrderingTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     AppNavigation(authViewModel,menuViewModel,
-                        orderViewModel,cartViewModel,
+                        orderViewModel,
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -93,8 +94,9 @@ fun MainScreen(menuViewModel: MenuViewModel, orderViewModel: OrderViewModel, use
 
 @Composable
 fun AppNavigation(authViewModel: AuthViewModel,menuViewModel: MenuViewModel,
-                  orderViewModel: OrderViewModel,cartViewModel: CartViewModel,
+                  orderViewModel: OrderViewModel,
                   modifier: Modifier = Modifier) {
+    val cartViewModel: CartViewModel = viewModel(factory = CartViewModel.factory)
     val navController = rememberNavController()
     NavHost(navController, startDestination = "login") {
         composable("login") { LoginScreen(authViewModel,navController) }

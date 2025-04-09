@@ -1,3 +1,3 @@
 package com.hansoft.foodordering.data.model
 
-data class CartUiState(var itemList: List<CartItem> = listOf())
+data class CartUiState(var itemList: List<CartItemEntity> = listOf())

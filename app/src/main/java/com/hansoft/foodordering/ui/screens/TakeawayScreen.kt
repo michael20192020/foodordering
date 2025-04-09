@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.Timestamp
 import com.hansoft.foodordering.data.model.CartItem
+import com.hansoft.foodordering.data.model.CartItemEntity
 import com.hansoft.foodordering.data.model.Order
 import com.hansoft.foodordering.viewmodel.CartViewModel
 import com.hansoft.foodordering.viewmodel.OrderViewModel
@@ -51,11 +52,12 @@ import com.hansoft.foodordering.viewmodel.OrderViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TakeawayScreen(cartViewModel: CartViewModel, orderViewModel: OrderViewModel, userId: String, onCheckout: () -> Unit) {
-
+    var uiState = cartViewModel.cartkUiState.collectAsState()
+    val cartItems = uiState.value.itemList
     var name by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
     var address by remember { mutableStateOf("") }
-    val cartItems by cartViewModel.cartItems.collectAsState()
+    // val cartItems by cartViewModel.cartItems.collectAsState()
     val totalPrice = cartItems.sumOf { it.quantity * it.price }
     var message by remember { mutableStateOf("") }
 
@@ -98,9 +100,18 @@ fun TakeawayScreen(cartViewModel: CartViewModel, orderViewModel: OrderViewModel,
                     dismissContent = {
                         TakeawayItemView(
                             item = item,
-                            onDeleteClick = { cartViewModel.deleteCartItem(item.id) },
-                            onReduceQuantityClick = { cartViewModel.reduceItemQuantity(item.id)},
-                            onIncreaseQuantityClick = { cartViewModel.increaseItemQuantity(item.id)}
+                            onDeleteClick = {
+                                //cartViewModel.deleteCartItem(item.id)
+                                cartViewModel.deleteCartItem(item)
+                                            },
+                            onReduceQuantityClick = {
+                                //cartViewModel.reduceItemQuantity(item.id)
+                                cartViewModel.reduceItemQuantity(item)
+                                                    },
+                            onIncreaseQuantityClick = {
+                                //cartViewModel.increaseItemQuantity(item.id)
+                                cartViewModel.increaseItemQuantity(item)
+                            }
                         )
                     }
                 )
@@ -156,7 +167,7 @@ fun TakeawayScreen(cartViewModel: CartViewModel, orderViewModel: OrderViewModel,
 }
 
 @Composable
-fun TakeawayItemView(item: CartItem, onDeleteClick: () -> Unit, onReduceQuantityClick: () -> Unit,
+fun TakeawayItemView(item: CartItemEntity, onDeleteClick: () -> Unit, onReduceQuantityClick: () -> Unit,
                  onIncreaseQuantityClick: () -> Unit) {
 
     Card(
